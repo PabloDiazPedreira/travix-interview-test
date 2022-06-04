@@ -1,11 +1,21 @@
 package com.travix.medusa.busyflights.domain.busyflights;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
+
 public class BusyFlightsRequest {
 
+    @Pattern(regexp = "^[A-Z]{3}$")
     private String origin;
+    @Pattern(regexp = "^[A-Z]{3}$")
     private String destination;
+    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$")
     private String departureDate;
+    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$")
     private String returnDate;
+    @Min(0)
+    @Max(4)
     private int numberOfPassengers;
 
     public String getOrigin() {
