@@ -1,0 +1,38 @@
+{
+	"info": {
+		"_postman_id": "6501e99f-c4d8-4849-8246-4e5451dd51ae",
+		"name": "Travix",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21305540"
+	},
+	"item": [
+		{
+			"name": "flights",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"origin\": \"LAX\",\n    \"destination\": \"HTR\",\n    \"departureDate\": \"2022-06-04\",\n    \"returnDate\": \"2022-06-05\",\n    \"numberOfPassengers\": 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/flights",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"flights"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
