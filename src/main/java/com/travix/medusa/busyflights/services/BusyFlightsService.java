@@ -1,11 +1,15 @@
-package com.travix.medusa.busyflights.service;
+package com.travix.medusa.busyflights.services;
 
 import com.travix.medusa.busyflights.domain.busyflights.BusyFlightsProviderResponse;
 import com.travix.medusa.busyflights.domain.busyflights.BusyFlightsRequest;
 import com.travix.medusa.busyflights.domain.busyflights.BusyFlightsResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 
+import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -14,48 +18,39 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Service
 public class BusyFlightsService {
+
+    private static final Logger logger = LoggerFactory.getLogger(BusyFlightsService.class);
 
     @Autowired
     CrazyAirService crazyAir;
     @Autowired
     ToughJetService toughJet;
 
-    public BusyFlightsResponse obtainFlights(BusyFlightsRequest busyFlightsRequest) throws Exception {
+    public BusyFlightsResponse obtainFlights(BusyFlightsRequest busyFlightsRequest) throws ValidationException, RestClientException {
 
-        //Other validations
+        //TODO: Other validations
         if(!checkDates(busyFlightsRequest.getDepartureDate(), busyFlightsRequest.getReturnDate())){
-            throw new Exception("flight dates are invalid");
+            logger.error("Flight dates are invalid");
+            throw new ValidationException("Flight dates are invalid");
         }
 
         List<BusyFlightsProviderResponse> crazyAirResults = crazyAir.obtainFlights(busyFlightsRequest);
+        logger.debug("Finished obtaining CrazyAir results successfully");
         List<BusyFlightsProviderResponse> toughJetResults = toughJet.obtainFlights(busyFlightsRequest);
+        logger.debug("Finished obtaining ToughJet results successfully");
 
         List<BusyFlightsProviderResponse> busyFlightsResults = new ArrayList<>();
         busyFlightsResults.addAll(crazyAirResults);
         busyFlightsResults.addAll(toughJetResults);
 
         busyFlightsResults = busyFlightsResults.stream().sorted(Comparator.comparingDouble(BusyFlightsProviderResponse::getFare)).collect(Collectors.toList());
+        logger.debug("Finished Obtaining flight information");
 
         return buildResponse(busyFlightsResults);
     }
-
-//    public void comprobarUsuarioActivo(UUID id) {
-//        RestTemplate restTemplate = new RestTemplate();
-//        ResponseEntity<ComprobarActivoRespuesta> comprobarActivoRespuesta;
-//        try {
-//            comprobarActivoRespuesta = restTemplate.exchange(urlUsuarios + urlComprobarActivo + id, HttpMethod.PUT, new HttpEntity<>(null), ComprobarActivoRespuesta.class);
-//        } catch (RestClientException excepcion) {
-//            logger.error("No se ha encontrado el usuario {}", id);
-//            throw new EmptyResultDataAccessException(1);
-//        }
-//
-//        if (comprobarActivoRespuesta.getBody() != null && !TRUE.equals(comprobarActivoRespuesta.getBody().getEstaActivo())) {
-//            logger.error("La sesion no esta activa para el usuario {}", id);
-//            throw new SecurityException("El usuario no está activo");
-//        }
-//    }
 
     private BusyFlightsResponse buildResponse(List<BusyFlightsProviderResponse> flightResults){
         BusyFlightsResponse busyFlightsResponse = new BusyFlightsResponse();
@@ -87,15 +82,5 @@ public class BusyFlightsService {
             areDatesValid = true;
         }
         return areDatesValid;
-    }
-
-    private boolean isDateValid(String date){
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
-        try {
-            LocalDate.parse(date, dateTimeFormatter);
-        } catch (DateTimeParseException e) {
-            return false;
-        }
-        return true;
     }
 }

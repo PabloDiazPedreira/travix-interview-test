@@ -1,8 +1,8 @@
-package com.travix.medusa.busyflights.controller;
+package com.travix.medusa.busyflights.controllers;
 
 import com.travix.medusa.busyflights.domain.busyflights.BusyFlightsRequest;
 import com.travix.medusa.busyflights.domain.busyflights.BusyFlightsResponse;
-import com.travix.medusa.busyflights.service.BusyFlightsService;
+import com.travix.medusa.busyflights.services.BusyFlightsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
